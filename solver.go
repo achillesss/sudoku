@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -14,6 +15,8 @@ import (
 )
 
 const full = 1<<9 - 1
+
+var useTestSudoku = flag.Bool("t", false, "求解程序内的 testSudoku")
 
 type block struct {
 	position int
@@ -123,14 +126,17 @@ func main() {
 	flag.Parse()
 	log.Infofln("start")
 
-	// inputBufio := bufio.NewReader(os.Stdin)
-	// initFunc := readBlock(inputBufio)
 	var s sudoku
 	s.region = new(region)
 
+	inputBufio := bufio.NewReader(os.Stdin)
+	initFunc := s.readBlock(inputBufio)
+
 	for j := 0; j < 9; j++ {
-		inputBufio := bufio.NewReader(strings.NewReader(testSudoku[j]))
-		initFunc := s.readBlock(inputBufio)
+		if *useTestSudoku {
+			inputBufio = bufio.NewReader(strings.NewReader(testSudoku[j]))
+			initFunc = s.readBlock(inputBufio)
+		}
 		inputErr := initFunc(j + 1)
 		for inputErr != nil {
 			inputErr = initFunc(j + 1)
